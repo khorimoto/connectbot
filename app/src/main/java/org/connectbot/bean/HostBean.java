@@ -226,6 +226,29 @@ public class HostBean extends AbstractBean {
 		return values;
 	}
 
+	public static HostBean fromContentValues(ContentValues values) {
+		HostBean host = new HostBean();
+		host.setNickname(values.getAsString(HostDatabase.FIELD_HOST_NICKNAME));
+		host.setProtocol(values.getAsString(HostDatabase.FIELD_HOST_PROTOCOL));
+		host.setUsername(values.getAsString(HostDatabase.FIELD_HOST_USERNAME));
+		host.setHostname(values.getAsString(HostDatabase.FIELD_HOST_HOSTNAME));
+		host.setPort(values.getAsInteger(HostDatabase.FIELD_HOST_PORT));
+		host.setLastConnect(values.getAsLong(HostDatabase.FIELD_HOST_LASTCONNECT));
+		host.setColor(values.getAsString(HostDatabase.FIELD_HOST_COLOR));
+		host.setUseKeys(Boolean.valueOf(values.getAsString(HostDatabase.FIELD_HOST_USEKEYS)));
+		host.setUseAuthAgent(values.getAsString(HostDatabase.FIELD_HOST_USEAUTHAGENT));
+		host.setPostLogin(values.getAsString(HostDatabase.FIELD_HOST_POSTLOGIN));
+		host.setPubkeyId(values.getAsLong(HostDatabase.FIELD_HOST_PUBKEYID));
+		host.setWantSession(Boolean.valueOf(values.getAsString(HostDatabase.FIELD_HOST_WANTSESSION)));
+		host.setDelKey(values.getAsString(HostDatabase.FIELD_HOST_DELKEY));
+		host.setFontSize(values.getAsInteger(HostDatabase.FIELD_HOST_FONTSIZE));
+		host.setCompression(Boolean.valueOf(values.getAsString(HostDatabase.FIELD_HOST_COMPRESSION)));
+		host.setEncoding(values.getAsString(HostDatabase.FIELD_HOST_ENCODING));
+		host.setStayConnected(values.getAsBoolean(HostDatabase.FIELD_HOST_STAYCONNECTED));
+		host.setQuickDisconnect(values.getAsBoolean(HostDatabase.FIELD_HOST_QUICKDISCONNECT));
+		return host;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null || !(o instanceof HostBean))
