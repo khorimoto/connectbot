@@ -19,10 +19,7 @@ package org.connectbot;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import org.connectbot.R;
 import org.connectbot.bean.HostBean;
 
 public class EditHostActivity extends AppCompatActivity implements HostEditorFragment.Listener {

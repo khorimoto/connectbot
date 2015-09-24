@@ -17,29 +17,16 @@
 
 package org.connectbot;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
 
-import org.connectbot.R;
 import org.connectbot.bean.HostBean;
-import org.connectbot.transport.SSH;
-import org.connectbot.transport.Telnet;
-import org.connectbot.transport.TransportFactory;
-import org.connectbot.util.HostDatabase;
 
 public class HostEditorFragment extends Fragment implements HostUriEditorFragment.Listener {
 	private static final String ARG_EXISTING_HOST = "isCreating";
