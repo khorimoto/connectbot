@@ -49,6 +49,8 @@ public class HostUriEditorFragment extends Fragment {
 
 	private static final String TAG = "HostUriEditorFragment";
 
+	private static final String IS_EXPANDED = "isExpanded";
+
 	// Listener for host URI changes.
 	private Listener mListener;
 
@@ -104,12 +106,16 @@ public class HostUriEditorFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		Bundle bundle = savedInstanceState == null ? getArguments() : savedInstanceState;
+
 		mUriData = new UriData();
-		mUriData.protocol = getArguments().getString(HostDatabase.FIELD_HOST_PROTOCOL);
-		mUriData.username = getArguments().getString(HostDatabase.FIELD_HOST_USERNAME);
-		mUriData.hostname = getArguments().getString(HostDatabase.FIELD_HOST_HOSTNAME);
-		mUriData.nickname = getArguments().getString(HostDatabase.FIELD_HOST_NICKNAME);
-		mUriData.port = getArguments().getInt(HostDatabase.FIELD_HOST_PORT);
+		mUriData.protocol = bundle.getString(HostDatabase.FIELD_HOST_PROTOCOL);
+		mUriData.username = bundle.getString(HostDatabase.FIELD_HOST_USERNAME);
+		mUriData.hostname = bundle.getString(HostDatabase.FIELD_HOST_HOSTNAME);
+		mUriData.nickname = bundle.getString(HostDatabase.FIELD_HOST_NICKNAME);
+		mUriData.port = bundle.getInt(HostDatabase.FIELD_HOST_PORT);
+
+		mIsExpanded = bundle.getBoolean(IS_EXPANDED);
 	}
 
 	@Override
@@ -129,17 +135,18 @@ public class HostUriEditorFragment extends Fragment {
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				String protocol = (String) mTransportSpinner.getSelectedItem();
 				if (protocol == null) {
-					// During initialization, protocol can be null before the list
-					// of dropdown items has been generated.
+					// During initialization, protocol can be null before the list of dropdown items
+					// has been generated. Return early in that case.
 					return;
 				}
 
 				mUriData.protocol = protocol;
 				mUriData.port = TransportFactory.getTransport(protocol).getDefaultPort();
 
-				mQuickConnectContainer.setHint(TransportFactory.getFormatHint(protocol, getActivity()));
-				mQuickConnectField.setText(null);
+				mQuickConnectContainer.setHint(
+						TransportFactory.getFormatHint(protocol, getActivity()));
 
+				// Different protocols have different field types, so show only the fields needed.
 				if (SSH.getProtocolName().equals(protocol)) {
 					mUsernameContainer.setVisibility(View.VISIBLE);
 					mHostnameContainer.setVisibility(View.VISIBLE);
@@ -151,17 +158,25 @@ public class HostUriEditorFragment extends Fragment {
 					mPortContainer.setVisibility(View.VISIBLE);
 					mExpandCollapseButton.setVisibility(View.VISIBLE);
 				} else {
+					// Local protocol has only one field, so no need to show the URI parts
+					// container.
 					setUriPartsContainerExpanded(false);
 					mExpandCollapseButton.setVisibility(View.INVISIBLE);
 				}
+
+				mListener.onInvalidUriEntered();
 			}
 
 			@Override
-			public void onNothingSelected(AdapterView<?> parent) {}
+			public void onNothingSelected(AdapterView<?> parent) {
+			}
 		});
 
-		mQuickConnectContainer = (TextInputLayout) view.findViewById(R.id.quickconnect_field_container);
-		mQuickConnectField = (EditText) view.findViewById(R.id.uri_field);
+		mQuickConnectContainer =
+				(TextInputLayout) view.findViewById(R.id.quickconnect_field_container);
+
+		mQuickConnectField = (EditText) view.findViewById(R.id.quickconnect_field);
+		mQuickConnectField.setText(mUriData.toString());
 		mQuickConnectField.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -172,23 +187,30 @@ public class HostUriEditorFragment extends Fragment {
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (mTransportSpinner.getSelectedItem() == null) {
-					// During initialization,
+					// During initialization, protocol can be null before the list of dropdown items
+					// has been generated. Return early in that case.
 					return;
 				}
 
-				String oldUriString = mUriData.toString();
-				mUriData.applyQuickConnectString(
-						s.toString(), (String) mTransportSpinner.getSelectedItem());
-
 				if (!mTextEditInProgress) {
+					mUriData.applyQuickConnectString(
+							s.toString(), (String) mTransportSpinner.getSelectedItem());
+
 					mTextEditInProgress = true;
 					mUsernameField.setText(mUriData.username);
 					mHostnameField.setText(mUriData.hostname);
 					mPortField.setText(Integer.toString(mUriData.port));
 					mTextEditInProgress = false;
 				}
+
+				if (mUriData.isValidUri()) {
+					mListener.onValidUriEntered(mUriData);
+				} else {
+					mListener.onInvalidUriEntered();
+				}
 			}
 		});
+
 		mExpandCollapseButton = (ImageButton) view.findViewById(R.id.expand_collapse_button);
 		mExpandCollapseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -196,16 +218,25 @@ public class HostUriEditorFragment extends Fragment {
 				setUriPartsContainerExpanded(!mIsExpanded);
 			}
 		});
+
 		mUriPartsContainer = view.findViewById(R.id.uri_parts_container);
+
 		mUsernameContainer = view.findViewById(R.id.username_field_container);
-		mHostnameContainer = view.findViewById(R.id.hostname_field_container);
-		mPortContainer = view.findViewById(R.id.port_field_container);
 		mUsernameField = (EditText) view.findViewById(R.id.username_edit_text);
+		mUsernameField.setText(mUriData.username);
 		mUsernameField.addTextChangedListener(new UriDataUpdater(HostDatabase.FIELD_HOST_USERNAME));
+
+		mHostnameContainer = view.findViewById(R.id.hostname_field_container);
 		mHostnameField = (EditText) view.findViewById(R.id.hostname_edit_text);
+		mHostnameField.setText(mUriData.hostname);
 		mHostnameField.addTextChangedListener(new UriDataUpdater(HostDatabase.FIELD_HOST_HOSTNAME));
+
+		mPortContainer = view.findViewById(R.id.port_field_container);
 		mPortField = (EditText) view.findViewById(R.id.port_edit_text);
+		mPortField.setText(Integer.toString(mUriData.port));
 		mPortField.addTextChangedListener(new UriDataUpdater(HostDatabase.FIELD_HOST_PORT));
+
+		setUriPartsContainerExpanded(mIsExpanded);
 
 		return view;
 	}
@@ -226,32 +257,63 @@ public class HostUriEditorFragment extends Fragment {
 		mListener = null;
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+
+		savedInstanceState.putString(HostDatabase.FIELD_HOST_PROTOCOL, mUriData.protocol);
+		savedInstanceState.putString(HostDatabase.FIELD_HOST_USERNAME, mUriData.username);
+		savedInstanceState.putString(HostDatabase.FIELD_HOST_HOSTNAME, mUriData.hostname);
+		savedInstanceState.putString(HostDatabase.FIELD_HOST_NICKNAME, mUriData.nickname);
+		savedInstanceState.putInt(HostDatabase.FIELD_HOST_PORT, mUriData.port);
+		savedInstanceState.putBoolean(IS_EXPANDED, mIsExpanded);
+	}
+
 	private void setUriPartsContainerExpanded(boolean expanded) {
-		if (expanded) {
-			mIsExpanded = true;
+		mIsExpanded = expanded;
+
+		if (mIsExpanded) {
 			mExpandCollapseButton.setImageResource(R.drawable.ic_expand_less);
 			mUriPartsContainer.setVisibility(View.VISIBLE);
 		} else {
-			mIsExpanded = false;
 			mExpandCollapseButton.setImageResource(R.drawable.ic_expand_more);
 			mUriPartsContainer.setVisibility(View.GONE);
 		}
 	}
 
-	public interface Listener {
-		public void onValidAddressEntered(UriData data);
-	}
-
+	/**
+	 * Contains the components of the URI entered.
+	 */
 	public static class UriData {
-		public String protocol = SSH.getProtocolName();
+		public String protocol;
 		public String username;
 		public String hostname;
 		public String nickname;
-		public int port = TransportFactory.getTransport(SSH.getProtocolName()).getDefaultPort();
+		public int port;
 
+		/**
+		 * @return Whether this represents a valid URI.
+		 */
+		public boolean isValidUri() {
+			if (protocol == null)
+				return false;
+
+			return TransportFactory.getUri(protocol, toString()) != null;
+		}
+
+		/**
+		 * Applies the quick-connect URI entered in the field by copying its URI parts to the
+		 * associated fields in this class.
+		 * @param quickConnectString The URI entered in the quick-connect field.
+		 * @param protocol The protocol for this connection.
+		 */
 		public void applyQuickConnectString(String quickConnectString, String protocol) {
+			if (quickConnectString == null || protocol == null)
+				return;
+
 			Uri uri = TransportFactory.getUri(protocol, quickConnectString);
 			if (uri == null) {
+				// If the URI was invalid, null out the associated fields.
 				username = null;
 				hostname = null;
 				nickname = null;
@@ -269,26 +331,41 @@ public class HostUriEditorFragment extends Fragment {
 
 		@Override
 		public String toString() {
+			if (protocol == null)
+				return "";
+
 			int defaultPort = TransportFactory.getTransport(protocol).getDefaultPort();
-			String usernameText = username == null ? "" : username;
-			String hostnameText = hostname == null ? "" : hostname;
-			String nicknameText = nickname == null ? "" : nickname;
+
 			if (SSH.getProtocolName().equals(protocol)) {
+				if (username == null || hostname == null ||
+						username.equals("") || hostname.equals(""))
+					return "";
+
 				if (port == defaultPort)
-					return usernameText + "@" + hostnameText;
+					return username + "@" + hostname;
 				else
-					return usernameText + "@" + hostnameText + ":" + port;
+					return username + "@" + hostname + ":" + port;
 			} else if (Telnet.getProtocolName().equals(protocol)) {
-				if (port == defaultPort)
-					return hostnameText;
+				if (hostname == null || hostname.equals(""))
+					return "";
+				else if (port == defaultPort)
+					return hostname;
 				else
-					return hostnameText + ":" + port;
+					return hostname + ":" + port;
 			} else if (Local.getProtocolName().equals(protocol)) {
-				return nicknameText;
+				return nickname;
 			} else {
 				throw new RuntimeException("Invalid protocol");
 			}
 		}
+	}
+
+	/**
+	 * Interface for listeners of URI changes.
+	 */
+	public interface Listener {
+		public void onValidUriEntered(UriData data);
+		public void onInvalidUriEntered();
 	}
 
 	private class UriDataUpdater implements TextWatcher {
@@ -325,6 +402,12 @@ public class HostUriEditorFragment extends Fragment {
 				mTextEditInProgress = true;
 				mQuickConnectField.setText(mUriData.toString());
 				mTextEditInProgress = false;
+			}
+
+			if (mUriData.isValidUri()) {
+				mListener.onValidUriEntered(mUriData);
+			} else {
+				mListener.onInvalidUriEntered();
 			}
 		}
 	}

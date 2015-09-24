@@ -22,12 +22,6 @@
 	android:orientation="vertical"
 	tools:context="org.connectbot.HostEditorFragment">
 
-	<TextView
-		android:id="@+id/title"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		tools:text="Title"/>
-
 	<FrameLayout
 		android:id="@+id/uri_editor_container"
 		android:layout_width="match_parent"

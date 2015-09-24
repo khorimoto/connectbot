@@ -32,9 +32,11 @@ public class EditHostActivity extends AppCompatActivity implements HostEditorFra
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_edit_host);
 
-		HostEditorFragment editor = HostEditorFragment.newInstance(null);
-		getSupportFragmentManager().beginTransaction()
-				.add(R.id.fragment_container, editor).commit();
+		if (savedInstanceState == null) {
+			HostEditorFragment editor = HostEditorFragment.newInstance(null);
+			getSupportFragmentManager().beginTransaction()
+					.add(R.id.fragment_container, editor).commit();
+		}
 	}
 
 	@Override

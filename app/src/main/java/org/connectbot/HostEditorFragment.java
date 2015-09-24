@@ -78,10 +78,12 @@ public class HostEditorFragment extends Fragment implements HostUriEditorFragmen
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_host_editor, container, false);
 
-		HostUriEditorFragment uriEditor =
-				HostUriEditorFragment.createInstance(mIsCreating ? null : mHost);
-		getChildFragmentManager().beginTransaction()
-				.add(R.id.uri_editor_container, uriEditor).commit();
+		if (savedInstanceState == null) {
+			HostUriEditorFragment uriEditor =
+					HostUriEditorFragment.createInstance(mIsCreating ? null : mHost);
+			getChildFragmentManager().beginTransaction()
+					.add(R.id.uri_editor_container, uriEditor).commit();
+		}
 
 		return view;
 	}
@@ -103,7 +105,12 @@ public class HostEditorFragment extends Fragment implements HostUriEditorFragmen
 	}
 
 	@Override
-	public void onValidAddressEntered(HostUriEditorFragment.UriData data) {
+	public void onValidUriEntered(HostUriEditorFragment.UriData data) {
+
+	}
+
+	@Override
+	public void onInvalidUriEntered() {
 
 	}
 

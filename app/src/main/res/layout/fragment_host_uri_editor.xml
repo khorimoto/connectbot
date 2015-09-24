@@ -56,11 +56,12 @@
 			android:layout_height="wrap_content">
 
 			<EditText
-				android:id="@+id/uri_field"
+				android:id="@+id/quickconnect_field"
 				android:layout_width="match_parent"
 				android:layout_weight="1"
 				android:layout_height="wrap_content"
-				android:hint="username@hostname:port" />
+				android:maxLines="1"
+				android:inputType="text" />
 
 		</android.support.design.widget.TextInputLayout>
 
@@ -93,7 +94,9 @@
 				android:id="@+id/username_edit_text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:hint="@string/hostpref_username_title"/>
+				android:hint="@string/hostpref_username_title"
+				android:maxLines="1"
+				android:inputType="text" />
 
 		</android.support.design.widget.TextInputLayout>
 
@@ -106,7 +109,9 @@
 				android:id="@+id/hostname_edit_text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:hint="@string/hostpref_hostname_title" />
+				android:hint="@string/hostpref_hostname_title"
+				android:maxLines="1"
+				android:inputType="text" />
 
 		</android.support.design.widget.TextInputLayout>
 
@@ -120,7 +125,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:inputType="number"
-				android:hint="@string/hostpref_port_title" />
+				android:hint="@string/hostpref_port_title"
+				android:maxLines="1" />
 
 		</android.support.design.widget.TextInputLayout>
 

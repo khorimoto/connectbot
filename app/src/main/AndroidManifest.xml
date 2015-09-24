@@ -46,6 +46,10 @@
 			android:name=".HostListActivity"
 			android:label="@string/title_hosts_list"
 			android:launchMode="singleTop">
+			<intent-filter android:label="@string/app_name">
+				<action android:name="android.intent.action.MAIN"/>
+				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
 			<intent-filter>
 				<action android:name="android.intent.action.CREATE_SHORTCUT"/>
 				<category android:name="android.intent.category.DEFAULT"/>
@@ -81,16 +85,13 @@
 		</activity>
 
 		<activity
-			android:name=".EditHostActivity"
-			android:configChanges="keyboardHidden|orientation"
-			android:label="@string/title_host_editor">
-			<intent-filter android:label="@string/app_name">
-				<action android:name="android.intent.action.MAIN"/>
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
+				android:name=".EditHostActivity"
+				android:configChanges="keyboardHidden|orientation"
+				android:label="@string/title_host_editor">
+			
 			<meta-data
-				android:name="android.support.PARENT_ACTIVITY"
-				android:value="org.connectbot.HostListActivity"/>
+					android:name="android.support.PARENT_ACTIVITY"
+					android:value="org.connectbot.HostListActivity"/>
 		</activity>
 
 		<activity
