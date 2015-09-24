@@ -86,9 +86,8 @@
 
 		<activity
 				android:name=".EditHostActivity"
-				android:configChanges="keyboardHidden|orientation"
 				android:label="@string/title_host_editor">
-			
+
 			<meta-data
 					android:name="android.support.PARENT_ACTIVITY"
 					android:value="org.connectbot.HostListActivity"/>
