@@ -74,7 +74,8 @@ public class HostUriEditorFragment extends Fragment {
 	private View mPortContainer;
 	private EditText mPortField;
 
-	public HostUriEditorFragment() {}
+	public HostUriEditorFragment() {
+	}
 
 	/**
 	 * Creates a HostUriEditorFragment. This static function should be used instead of calling the
@@ -388,7 +389,8 @@ public class HostUriEditorFragment extends Fragment {
 			} else if (HostDatabase.FIELD_HOST_PORT.equals(mFieldType)) {
 				try {
 					mUriData.port = Integer.parseInt(text);
-				} catch (NumberFormatException e) {}
+				} catch (NumberFormatException e) {
+				}
 			} else {
 				throw new RuntimeException("Invalid field type.");
 			}

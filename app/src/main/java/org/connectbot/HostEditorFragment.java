@@ -46,7 +46,9 @@ public class HostEditorFragment extends Fragment implements HostUriEditorFragmen
 		return fragment;
 	}
 
-	public HostEditorFragment() {}
+	public HostEditorFragment() {
+
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
