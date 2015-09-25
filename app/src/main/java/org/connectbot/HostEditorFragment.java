@@ -28,7 +28,8 @@ import android.view.ViewGroup;
 
 import org.connectbot.bean.HostBean;
 
-public class HostEditorFragment extends Fragment implements HostUriEditorFragment.Listener {
+public class HostEditorFragment extends Fragment
+		implements HostUriEditorFragment.Listener, HostDisplayEditorFragment.Listener {
 	private static final String ARG_EXISTING_HOST = "isCreating";
 
 	private HostBean mHost;
@@ -72,6 +73,11 @@ public class HostEditorFragment extends Fragment implements HostUriEditorFragmen
 					HostUriEditorFragment.createInstance(mIsCreating ? null : mHost);
 			getChildFragmentManager().beginTransaction()
 					.add(R.id.uri_editor_container, uriEditor).commit();
+
+			HostDisplayEditorFragment displayEditor =
+					HostDisplayEditorFragment.createInstance(mIsCreating ? null : mHost);
+			getChildFragmentManager().beginTransaction()
+					.add(R.id.display_editor_container, displayEditor).commit();
 		}
 
 		return view;
@@ -100,6 +106,11 @@ public class HostEditorFragment extends Fragment implements HostUriEditorFragmen
 
 	@Override
 	public void onInvalidUriEntered() {
+
+	}
+
+	@Override
+	public void onDisplaySettingsChanged(HostDisplayEditorFragment.DisplayData data) {
 
 	}
 
